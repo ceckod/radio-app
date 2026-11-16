@@ -1,0 +1,40 @@
+name: Unzip radio-android.zip
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'radio-android.zip'
+
+permissions:
+  contents: write
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract zip into repo root
+        run: |
+          set -e
+          ZIP=$(ls *.zip | head -n 1)
+          mkdir /tmp/x
+          unzip -q "$ZIP" -d /tmp/x
+          # ако всичко е в една папка (radio-app/), вземи съдържанието ѝ
+          if [ "$(ls -A /tmp/x | wc -l)" = "1" ] && [ -d "/tmp/x/$(ls /tmp/x)" ]; then
+            SRC="/tmp/x/$(ls /tmp/x)"
+          else
+            SRC=/tmp/x
+          fi
+          cp -a "$SRC"/. .
+          rm -f "$ZIP"
+          chmod +x gradlew || true
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Unzip radio-android project" || echo "nothing to commit"
+          git push
