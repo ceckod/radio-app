@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Радио</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Радио</string>
+    <string name="nav_header_subtitle">Интернет радио на живо</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_settings">Settings</string>
+    <string name="nav_home_root">Root</string>
+    <string name="player_empty_label">No item</string>
+    <string name="background_restricted_title">Фоновото свирене е ограничено</string>
+    <string name="background_restricted_message">Андроид ще спре радиото, когато излезеш от приложението или екранът изгасне. За да свири непрекъснато: Настройки на приложението → Батерия → разреши фонова работа (Без ограничения или Оптимизирано).</string>
+    <string name="background_restricted_open_settings">Отвори настройките</string>
+</resources>

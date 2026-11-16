@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.OpenOpenRadio" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">#2F9BFF</item>
+        <item name="colorPrimaryDark">#090D16</item>
+        <item name="colorOnPrimary">#04101F</item>
+        <item name="colorSurface">#16233F</item>
+        <item name="colorOnSurface">#F2F5FA</item>
+        <item name="android:windowBackground">#090D16</item>
+        <item name="android:statusBarColor">#090D16</item>
+        <item name="android:navigationBarColor">#090D16</item>
+    </style>
+
+    <style name="Theme.OpenOpenRadio.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.OpenOpenRadio.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.OpenOpenRadio.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+</resources>

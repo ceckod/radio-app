@@ -1,0 +1,306 @@
+package com.charlyghislain.openopenradio.service.media
+
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import androidx.annotation.OptIn
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.datastore.core.DataStore
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.DefaultLivePlaybackSpeedControl
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.session.MediaLibraryService.MediaLibrarySession
+import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
+import androidx.media3.session.SessionResult
+import com.charlyghislain.openopenradio.service.R
+import com.charlyghislain.openopenradio.service.radio.repository.StationFavoritesRepository
+import com.charlyghislain.openopenradio.service.radio.settings.Settings
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.SettableFuture
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import java.util.concurrent.CompletableFuture
+import javax.inject.Inject
+
+@AndroidEntryPoint
+open class OpenOpenRadioMediaPlaybackService : MediaSessionService() {
+    companion object {
+        private const val NOTIFICATION_ID = 123
+        private const val CHANNEL_ID = "session_notification_channel_id"
+        private const val PLAYBACK_PREFS = "playback"
+        private const val KEY_LAST_MEDIA_ID = "last_media_id"
+    }
+
+
+    /**
+     * Returns the single top session activity. It is used by the notification when the app task is
+     * active and an activity is in the fore or background.
+     *
+     * Tapping the notification then typically should trigger a single top activity. This way, the
+     * user navigates to the previous activity when pressing back.
+     *
+     * If null is returned, [MediaSession.setSessionActivity] is not set by the demo service.
+     */
+    open fun getSingleTopActivity(): PendingIntent? = null
+
+    /**
+     * Returns a back stacked session activity that is used by the notification when the service is
+     * running standalone as a foreground service. This is typically the case after the app has been
+     * dismissed from the recent tasks, or after automatic playback resumption.
+     *
+     * Typically, a playback activity should be started with a stack of activities underneath. This
+     * way, when pressing back, the user doesn't land on the home screen of the device, but on an
+     * activity defined in the back stack.
+     *
+     * See [androidx.core.app.TaskStackBuilder] to construct a back stack.
+     *
+     * If null is returned, [MediaSession.setSessionActivity] is not set by the demo service.
+     */
+    open fun getBackStackedActivity(): PendingIntent? = null
+
+    /**
+     * Creates the library session callback to implement the domain logic. Can be overridden to return
+     * an alternative callback, for example a subclass of [DemoMediaLibrarySessionCallback].
+     *
+     * This method is called when the session is built by the [DemoPlaybackService].
+     */
+    protected open fun createLibrarySessionCallback(): MediaLibrarySession.Callback {
+        return MediaSessionCallback(this)
+    }
+
+    private var mediaSession: MediaLibrarySession? = null
+
+    @Inject
+    lateinit var treeService: MediaTreeService;
+
+    @Inject
+    lateinit var favoritesRepository: StationFavoritesRepository;
+
+    @Inject
+    lateinit var settingsStore: DataStore<Settings>
+
+    @OptIn(UnstableApi::class)
+    override fun onCreate() {
+        super.onCreate()
+
+        // The settings file is tiny and the player needs it before it can be built.
+        val settings = runBlocking { settingsStore.data.catch { emit(Settings()) }.first() }
+
+        val audioAttributes = AudioAttributes.Builder()
+            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+            .setUsage(C.USAGE_MEDIA)
+            .setAllowedCapturePolicy(C.ALLOW_CAPTURE_BY_ALL)
+            .build()
+
+        val httpDatasource = DefaultHttpDataSource.Factory()
+            .setAllowCrossProtocolRedirects(true)
+            .setConnectTimeoutMs(settings.connectTimeoutMs)
+            .setReadTimeoutMs(settings.readTimeoutMs)
+        val player = ExoPlayer.Builder(this)
+            .setAudioAttributes(audioAttributes, true)
+            .setHandleAudioBecomingNoisy(true)
+            // Keeps CPU and Wi-Fi awake while streaming with the screen off.
+            .setWakeMode(C.WAKE_MODE_NETWORK)
+            .setMediaSourceFactory(
+                DefaultMediaSourceFactory(httpDatasource)
+                    .setLiveTargetOffsetMs(settings.liveTargetOffsetMs.toLong())
+            )
+            .setLivePlaybackSpeedControl(
+                DefaultLivePlaybackSpeedControl.Builder()
+                    .setFallbackMaxPlaybackSpeed(settings.fallbackMaxPlaybackSpeed)
+                    .setFallbackMinPlaybackSpeed(settings.fallbackMinPlaybackSpeed)
+                    .build()
+            )
+            .build()
+        player.addListener(PlayerListener(player))
+        player.addListener(object : Player.Listener {
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                mediaItem?.mediaId?.let { lastPlayedMediaId = it }
+            }
+        })
+
+
+        mediaSession = MediaLibrarySession.Builder(this, player, createLibrarySessionCallback())
+//            .setPeriodicPositionUpdateEnabled(false)
+            .also { builder -> getSingleTopActivity()?.let { builder.setSessionActivity(it) } }
+            .build()
+        setListener(MediaSessionServiceListener())
+    }
+
+    // The user dismissed the app from the recent tasks
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        val player = mediaSession?.player ?: return stopSelf()
+        if (!player.playWhenReady
+            || player.mediaItemCount == 0
+            || player.playbackState == Player.STATE_ENDED
+        ) {
+            // Stop the service if not playing, continue playing in the background
+            // otherwise.
+            stopSelf()
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    override fun onDestroy() {
+        getBackStackedActivity()?.let { mediaSession?.setSessionActivity(it) }
+        mediaSession?.run {
+            player.release()
+            release()
+            mediaSession = null
+        }
+        clearListener()
+        super.onDestroy()
+    }
+
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
+        return mediaSession;
+    }
+
+
+    @OptIn(UnstableApi::class) // MediaSessionService.Listener
+    private inner class MediaSessionServiceListener : Listener {
+
+        /**
+         * This method is only required to be implemented on Android 12 or above when an attempt is made
+         * by a media controller to resume playback when the {@link MediaSessionService} is in the
+         * background.
+         */
+        override fun onForegroundServiceStartNotAllowedException() {
+            if (
+                Build.VERSION.SDK_INT >= 33 &&
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // Notification permission is required but not granted
+                return
+            }
+            val notificationManagerCompat =
+                NotificationManagerCompat.from(this@OpenOpenRadioMediaPlaybackService)
+            ensureNotificationChannel(notificationManagerCompat)
+            val builder =
+                NotificationCompat.Builder(this@OpenOpenRadioMediaPlaybackService, CHANNEL_ID)
+                    .setSmallIcon(androidx.media3.session.R.drawable.media3_notification_small_icon)
+                    .setContentTitle(getString(R.string.notification_content_title))
+                    .setStyle(
+                        NotificationCompat.BigTextStyle()
+                            .bigText(getString(R.string.notification_content_text))
+                    )
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setAutoCancel(true)
+                    .also { builder -> getBackStackedActivity()?.let { builder.setContentIntent(it) } }
+            notificationManagerCompat.notify(NOTIFICATION_ID, builder.build())
+        }
+    }
+
+    private fun ensureNotificationChannel(notificationManagerCompat: NotificationManagerCompat) {
+        if (
+            Build.VERSION.SDK_INT < 26 ||
+            notificationManagerCompat.getNotificationChannel(CHANNEL_ID) != null
+        ) {
+            return
+        }
+
+        val channel =
+            NotificationChannel(
+                CHANNEL_ID,
+                getString(R.string.notification_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT,
+            )
+        notificationManagerCompat.createNotificationChannel(channel)
+    }
+
+    /** Media id of the last played station, kept across process deaths for playback resumption. */
+    var lastPlayedMediaId: String?
+        get() = getSharedPreferences(PLAYBACK_PREFS, MODE_PRIVATE).getString(KEY_LAST_MEDIA_ID, null)
+        private set(value) {
+            getSharedPreferences(PLAYBACK_PREFS, MODE_PRIVATE).edit()
+                .putString(KEY_LAST_MEDIA_ID, value)
+                .apply()
+        }
+
+    fun setFavorite(mediaId: String?, heart: Boolean): ListenableFuture<SessionResult> {
+        val settableFuture = SettableFuture.create<SessionResult>()
+
+        if (mediaId != null) {
+            val stationId = StationId.parseString(mediaId)
+            val dbOperationFuture: CompletableFuture<Void?> =
+                if (heart) {
+                    favoritesRepository.addFavorite(stationId.source, stationId.sourceId)
+                } else {
+                    favoritesRepository.removeFavorite(stationId.source, stationId.sourceId)
+                }
+            dbOperationFuture.whenComplete { _, throwable ->
+                if (throwable != null) {
+                    settableFuture.setException(throwable)
+                } else {
+                    settableFuture.set(SessionResult(SessionResult.RESULT_SUCCESS))
+                }
+            }
+        } else {
+            settableFuture.set(SessionResult(SessionResult.RESULT_SUCCESS))
+        }
+        return settableFuture
+    }
+
+}
+
+@UnstableApi
+class PlayerListener(val player: ExoPlayer) : Player.Listener {
+    companion object {
+        private const val MAX_NETWORK_RETRIES = 20
+        private const val MAX_RETRY_DELAY_MS = 10_000L
+    }
+
+    private val handler = Handler(Looper.getMainLooper())
+    private var networkRetries = 0
+
+    override fun onPlaybackStateChanged(playbackState: Int) {
+        if (playbackState == Player.STATE_READY) {
+            networkRetries = 0
+        }
+    }
+
+    override fun onPlayerError(error: PlaybackException) {
+        if (error.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW) {
+            // Re-initialize player at the live edge.
+            player.seekToDefaultPosition()
+            player.prepare()
+        } else if (isNetworkError(error) && networkRetries < MAX_NETWORK_RETRIES) {
+            // Streams drop on network handovers (screen off, tunnels, wifi to mobile): reconnect with backoff.
+            networkRetries++
+            val delayMs = (networkRetries * 1000L).coerceAtMost(MAX_RETRY_DELAY_MS)
+            handler.postDelayed({
+                if (player.playerError != null && player.playWhenReady) {
+                    player.seekToDefaultPosition()
+                    player.prepare()
+                }
+            }, delayMs)
+        } else {
+            Log.w("PlayerListener", "Playback error", error)
+        }
+    }
+
+    private fun isNetworkError(error: PlaybackException): Boolean {
+        return error.errorCode in PlaybackException.ERROR_CODE_IO_UNSPECIFIED..PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT
+                || error.errorCode == PlaybackException.ERROR_CODE_TIMEOUT
+    }
+}
+
