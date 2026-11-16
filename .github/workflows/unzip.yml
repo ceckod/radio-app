@@ -27,6 +27,7 @@ jobs:
           else
             SRC=/tmp/x
           fi
+          rm -rf "$SRC/.github"   # GITHUB_TOKEN не може да пише workflow файлове
           cp -a "$SRC"/. .
           rm -f "$ZIP"
           chmod +x gradlew || true
