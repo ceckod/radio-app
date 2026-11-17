@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Радио – Peugeot 308</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#090d16">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#090d16;--line:#1f2a3d;--text:#f2f5fa;--muted:#8d9ab0;--accent:#2f9bff;--vio:#8b5cf6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:clamp(11px,1.95vmin,26px)}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body{height:100dvh;display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:radial-gradient(90% 60% at 80% 0,#16204a 0,transparent 60%),var(--bg)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+input{font:inherit;color:inherit;-webkit-user-select:text;user-select:text}
+.ic{width:1em;height:1em;fill:currentColor;flex:none;display:block}
+
+/* горна лента */
+.top{flex:none;display:flex;align-items:center;gap:1rem;padding:.8rem 1rem .6rem}
+.hb{flex:none;width:5rem;height:3.6rem;border-radius:1.1rem;background:#0f2447;border:2px solid var(--accent);box-shadow:0 0 18px rgba(47,155,255,.45);display:grid;place-items:center;font-size:2rem}
+.sep{flex:none;width:1px;height:2.4rem;background:var(--line)}
+.search{flex:1;min-width:0;display:flex;align-items:center;gap:.8rem;height:3.6rem;padding:0 1.3rem;border-radius:1.2rem;background:#0d1320;border:1px solid var(--line);color:var(--muted);font-size:1.5rem}
+.search input{flex:1;min-width:0;background:none;border:0;outline:0;font-size:1.2rem;color:var(--text)}
+.search input::placeholder{color:var(--muted)}
+.gb{flex:none;width:4.2rem;height:3.6rem;border-radius:1.1rem;background:#0d1320;border:1px solid var(--line);display:grid;place-items:center;font-size:1.8rem}
+
+/* среда */
+.mid{flex:1;min-height:0;display:flex;gap:.8rem;padding:0 1rem}
+#rail{flex:none;width:8.4rem;display:flex;flex-direction:column;gap:.5rem;padding:.4rem;border-radius:1.4rem;background:#0b101a;border:1px solid #151d2c;overflow-y:auto}
+#rail button{flex:1;min-height:5.2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;border-radius:1.2rem;color:#c3cbda;font-size:.95rem}
+#rail button .ic{font-size:2.1rem}
+#rail button.on{background:linear-gradient(#2f9bff,#1c76e6);color:#fff;box-shadow:0 6px 20px rgba(47,155,255,.35)}
+#main{flex:1;min-width:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:1rem}
+
+/* сега свири */
+#hero{position:relative;display:flex;align-items:center;gap:1.6rem;padding:1.3rem;margin-bottom:1.2rem;border-radius:1.6rem;overflow:hidden;border:1px solid #243060;
+ background:radial-gradient(55% 130% at 88% 35%,rgba(125,75,255,.5),transparent 62%),radial-gradient(45% 100% at 60% 110%,rgba(30,140,255,.4),transparent 60%),linear-gradient(120deg,#0e1430,#131a47)}
+.nohero #hero{display:none}
+.cover{--h:220;flex:none;width:11rem;height:11rem;border-radius:1.3rem;border:2px solid hsl(var(--h) 70% 55%);display:grid;place-items:center;padding:.8rem;text-align:center;
+ background:linear-gradient(145deg,hsl(var(--h) 60% 22%),hsl(var(--h) 55% 8%));box-shadow:0 0 28px hsl(var(--h) 80% 50% / .35)}
+.cover b{font-size:1.7rem;line-height:1.1;text-transform:uppercase;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;word-break:break-word}
+.hi{flex:1;min-width:0;display:flex;flex-direction:column;gap:.5rem}
+.bdg{align-self:flex-start;display:flex;align-items:center;gap:.6rem;padding:.35rem 1rem;border-radius:2rem;background:rgba(10,14,28,.75);border:1px solid #2a3558;font-size:1.05rem}
+.bdg .dot{width:.8rem;height:.8rem;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e}
+.bdg.off .dot{background:#64748b;box-shadow:none}
+#hn{font-size:2.3rem;font-weight:800;line-height:1.1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#hs{font-size:1.25rem;color:#b6c0d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.viz{display:flex;align-items:flex-end;gap:.25rem;height:3.4rem;margin-top:.3rem;max-width:30rem}
+.viz i{flex:1;height:15%;border-radius:2px;background:linear-gradient(#38bdf8,#8b5cf6);animation:vz 1s ease-in-out infinite;animation-play-state:paused}
+body.pl .viz i{animation-play-state:running}
+@keyframes vz{0%,100%{height:15%}50%{height:var(--m)}}
+.hc{flex:none;display:flex;flex-direction:column;align-items:center;gap:1rem}
+.hr{display:flex;align-items:center;gap:1.2rem}
+.rb{width:5rem;height:5rem;border-radius:50%;background:rgba(8,12,26,.7);border:2px solid #34406a;display:grid;place-items:center;font-size:2.1rem}
+#pp{width:7.4rem;height:7.4rem;border-radius:50%;display:grid;place-items:center;font-size:3.2rem;border:5px solid transparent;
+ background:linear-gradient(#0b1226,#0b1226) padding-box,linear-gradient(135deg,#38bdf8,#8b5cf6) border-box;box-shadow:0 0 26px rgba(90,110,255,.5)}
+#pp:disabled,#pp2:disabled{opacity:.45}
+#hfav{display:flex;align-items:center;gap:.6rem;padding:.7rem 1.4rem;border-radius:2rem;background:rgba(8,12,26,.7);border:1px solid #34406a;font-size:1.2rem}
+#hfav .ic{font-size:1.4rem}
+#hfav.on{color:#ff6b9a;border-color:#ff6b9a}
+button:active{filter:brightness(1.4)}
+
+/* секции */
+.sh{display:flex;align-items:center;justify-content:space-between;margin:.4rem .2rem .7rem}
+.sh h2{margin:0;font-size:1.7rem}
+.more{padding:.5rem 1.1rem;border-radius:2rem;background:#121a29;border:1px solid var(--line);font-size:.95rem;color:#c3cbda}
+section{margin-bottom:.9rem}
+.row{display:flex;gap:1rem;overflow-x:auto;padding:.5rem .3rem 1rem;-webkit-overflow-scrolling:touch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:1rem;padding:.3rem}
+.card{--h:200;position:relative;flex:none;width:15.5rem;height:9.6rem;padding:1rem 1.1rem;border-radius:1.3rem;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
+ background:linear-gradient(145deg,hsl(var(--h) 55% 30%),hsl(var(--h) 60% 13%));border:2px solid hsl(var(--h) 55% 40% / .7)}
+.grid .card{width:auto}
+.card b{font-size:1.5rem;line-height:1.1;text-transform:uppercase;padding-right:2rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.cb{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.cb span{font-size:1.05rem;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbtn{flex:none;width:2.6rem;height:2.6rem;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.35);display:grid;place-items:center;font-size:1.2rem}
+.fv{position:absolute;top:.6rem;right:.6rem;width:2.4rem;height:2.4rem;border-radius:50%;display:grid;place-items:center;font-size:1.3rem;color:#fff;opacity:.75}
+.fv.on{color:#ff6b9a;opacity:1}
+.card.playing,.chip.playing{border-color:#4aa8ff;box-shadow:0 0 0 2px #2f9bff,0 0 26px rgba(47,155,255,.5)}
+.chip{flex:none;min-width:17rem;display:flex;align-items:center;gap:1rem;padding:.9rem 1.3rem;border-radius:1.2rem;background:#151227;border:1px solid #2b2540;cursor:pointer}
+.chip .hrt{font-size:2.3rem}
+.chip div{flex:1;min-width:0}
+.chip b{display:block;font-size:1.2rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip span{font-size:.95rem;color:var(--muted)}
+.chip .eqi{font-size:1.5rem;color:#c3cbda}
+.catb{display:flex;flex-direction:column;align-items:flex-start;gap:.3rem;padding:1.1rem 1.2rem;border-radius:1.3rem;background:linear-gradient(145deg,#16203a,#0e1424);border:1px solid #26334f;text-align:left}
+.catb .ic{font-size:2rem;color:var(--accent)}
+.catb b{font-size:1.4rem}.catb span{font-size:1rem;color:var(--muted)}
+.msg{color:var(--muted);padding:1rem .4rem;font-size:1.2rem}
+
+/* настройки */
+.set{max-width:46rem;display:flex;flex-direction:column;gap:1rem;padding:.3rem}
+.set h2{margin:.2rem 0;font-size:1.7rem}
+.srow{padding:1rem 1.2rem;border-radius:1.2rem;background:#0f1522;border:1px solid var(--line)}
+.srow b{display:block;font-size:1.25rem;margin-bottom:.3rem}
+.srow span{font-size:1.05rem;color:var(--muted);line-height:1.4}
+.btns{display:flex;flex-wrap:wrap;gap:.8rem}
+.btn{display:flex;align-items:center;gap:.7rem;padding:.9rem 1.4rem;border-radius:1.1rem;background:#16233f;border:1px solid #2a3c66;font-size:1.15rem}
+.btn .ic{font-size:1.4rem}
+.ver{color:var(--muted);font-size:.9rem;margin:0}
+
+/* долна лента */
+.bar{flex:none;margin:.6rem 1rem .8rem;height:5.2rem;display:flex;align-items:center;gap:1.2rem;padding:0 1.2rem;border-radius:1.6rem;background:linear-gradient(#141a26,#0e121b);border:1px solid #232c3d}
+.bi{flex:none;width:3.6rem;height:3.6rem;border-radius:50%;background:linear-gradient(135deg,#2f6bff,#6a5cff);display:grid;place-items:center;font-size:1.8rem}
+#info{flex:0 1 22rem;min-width:0}
+#nm{font-size:1.4rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#st{font-size:1rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini{flex:none;display:flex;align-items:center;gap:.6rem}
+body:not(.nohero) .mini{display:none}
+.mini button{width:3.6rem;height:3.6rem;border-radius:50%;background:#182032;border:1px solid #2a3548;display:grid;place-items:center;font-size:1.5rem}
+#pp2{background:linear-gradient(135deg,#2f6bff,#6a5cff);border:0}
+.prog{flex:1;min-width:0;display:flex;align-items:center;gap:1rem}
+.live{flex:1;height:.55rem;border-radius:1rem;background:#202a3b;overflow:hidden;position:relative}
+.live::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#2f9bff,#8b5cf6);opacity:.35;border-radius:1rem}
+body.pl .live::after{opacity:1;background:linear-gradient(90deg,#2f9bff,#8b5cf6,#2f9bff);background-size:200% 100%;animation:lv 2.2s linear infinite}
+@keyframes lv{to{background-position:-200% 0}}
+#tm{flex:none;font-size:1.05rem;color:#aab4c8;min-width:9rem;text-align:right;font-variant-numeric:tabular-nums}
+.vol{flex:none;display:flex;align-items:center;gap:.7rem;font-size:1.7rem;color:#c3cbda}
+#vol{width:10rem;accent-color:var(--accent);height:2.4rem}
+#ssb{flex:none;width:3.8rem;height:3.8rem;border-radius:1.1rem;background:#1b2230;border:1px solid #2a3548;display:grid;place-items:center;font-size:1.8rem;color:#fff}
+
+@media (max-width:1000px){.vol{display:none}}
+@media (max-width:760px){.prog{display:none}#info{flex:1}}
+@media (max-aspect-ratio:1/1){
+ #rail{width:5.6rem}#rail button{font-size:.62rem;min-height:4.2rem}#rail button .ic{font-size:1.8rem}
+ #hero{flex-wrap:wrap}.cover{width:7rem;height:7rem}.cover b{font-size:1.1rem}.hc{width:100%}
+ .grid{grid-template-columns:repeat(auto-fill,minmax(11rem,1fr))}
+}
+
+/* скрийнсейвър (непроменено) */
+#ss{display:none;position:fixed;inset:0;z-index:50;background:#000}
+#cv{display:block;width:100%;height:100%}
+#ssc{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:40px;background:rgba(20,24,30,.85);opacity:0;pointer-events:none;transition:opacity .3s}
+#ssc button{width:54px;height:54px;border-radius:50%;border:3px solid transparent;font-size:24px;color:#fff;background:#333}
+#ssc button.sel{border-color:#fff}
+@media (max-width:900px),(max-height:520px){#ssc button{width:44px;height:44px}}
+#ssc button{width:clamp(44px,7.5vmin,80px);height:clamp(44px,7.5vmin,80px)}
+#ssc{top:max(10px,env(safe-area-inset-top,0px));width:max-content;max-width:calc(100vw - 16px);flex-wrap:wrap;justify-content:center;gap:clamp(6px,1.2vmin,12px);padding:10px 12px;border-radius:28px}
+#ssc button{width:clamp(40px,7.5vmin,80px);height:clamp(40px,7.5vmin,80px);flex:none}
+</style>
+</head>
+<body>
+<header class="top">
+ <button class="hb" id="homeB" aria-label="Начало"></button><div class="sep"></div>
+ <label class="search"><span id="sico"></span><input id="q" type="search" placeholder="Търсене на радиа…" autocomplete="off"></label>
+ <button class="gb" id="setB" aria-label="Настройки"></button>
+</header>
+<div class="mid">
+ <nav id="rail"></nav>
+ <main id="main">
+  <section id="hero">
+   <div class="cover" id="cover"><b id="cvt">RADIO</b></div>
+   <div class="hi">
+    <div class="bdg off" id="bdg"><span class="dot"></span><span id="bt">Радио</span></div>
+    <div id="hn">Избери радио</div>
+    <div id="hs">Избери станция от списъка</div>
+    <div class="viz" id="viz"></div>
+   </div>
+   <div class="hc">
+    <div class="hr"><button class="rb" id="pv" aria-label="Предишна"></button><button id="pp" disabled aria-label="Пусни / пауза"></button><button class="rb" id="nx" aria-label="Следваща"></button></div>
+    <button id="hfav"></button>
+   </div>
+  </section>
+  <div id="view"></div>
+ </main>
+</div>
+<footer class="bar">
+ <div class="bi" id="bico"></div>
+ <div id="info"><div id="nm">Избери радио</div><div id="st">Натисни станция – започва веднага</div></div>
+ <div class="mini"><button id="pv2" aria-label="Предишна"></button><button id="pp2" disabled aria-label="Пусни / пауза"></button><button id="nx2" aria-label="Следваща"></button></div>
+ <div class="prog"><div class="live"></div><div id="tm"></div></div>
+ <div class="vol"><span id="vico"></span><input id="vol" type="range" min="0" max="100" step="1" value="85" aria-label="Звук"></div>
+ <button id="ssb" aria-label="Матрица">🌧</button>
+</footer>
+<div id="ss"><canvas id="cv"></canvas><div id="ssc"></div></div>
+<audio id="au" preload="none"></audio>
+<script>
+const $=id=>document.getElementById(id);
+// Във приложението за Андроид звукът се пуска от плейъра на телефона (за Android Auto, волана и фоновото свирене)
+const NAT=window.AndroidRadio||null;
+let nativeSong='',pendingNS=null,syncT=0;
+function makeNativeAudio(){
+ const et=new EventTarget();let src='',paused=true,vol=1;
+ window.__native=ev=>{
+  if(ev.t==='station'){nativeStation(ev.name);return}
+  if(ev.t==='song'){nativeSong=ev.title||'';if(nativeSong)status('🎵 '+nativeSong);return}
+  if(ev.t==='playing')paused=false;else if(ev.t==='pause'||ev.t==='error')paused=true;
+  et.dispatchEvent(new Event(ev.t))};
+ return{
+  get src(){return src},set src(v){src=v},get paused(){return paused},get ended(){return false},
+  get volume(){return vol},set volume(v){vol=v;try{NAT.setVolume(v)}catch(e){}},
+  play(){try{NAT.play(cur?cur.name:'',src,cur&&cur.sub?cur.sub:'')}catch(e){return Promise.reject(e)}return Promise.resolve()},
+  pause(){try{NAT.pause()}catch(e){}},
+  addEventListener(t,f){et.addEventListener(t,f)},removeAttribute(){},load(){}}}
+const au=NAT?makeNativeAudio():document.getElementById('au');
+const $$=q=>[...document.querySelectorAll(q)];
+// Постоянни международни стриймове (https, дългогодишни)
+const FIXED=[
+["Света","SomaFM Groove Salad","https://ice1.somafm.com/groovesalad-128-mp3","Chill"],
+["Света","SomaFM Drone Zone","https://ice1.somafm.com/dronezone-128-mp3","Ambient"],
+["Света","Radio Paradise","https://stream.radioparadise.com/mp3-128","Еклектика"],
+["Света","KEXP Seattle","https://kexp.streamguys1.com/kexp160.aac","Инди / рок"],
+["Света","FIP (Франция)","https://icecast.radiofrance.fr/fip-midfi.mp3","Еклектика"],
+["Света","France Inter","https://icecast.radiofrance.fr/franceinter-midfi.mp3","Новини FR"],
+["Света","Deutschlandfunk","https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3","Новини DE"],
+["Света","Jazz24","https://live.wostreaming.net/direct/ppm-jazz24mp3-ibc1","Джаз"]
+].map(([c,n,u,s])=>({cat:c,name:n,urls:[u],sub:s}));
+// Български станции се теглят от Radio Browser (общностен каталог със здравни проверки)
+const APIS=['https://de1.api.radio-browser.info','https://fi1.api.radio-browser.info','https://nl1.api.radio-browser.info','https://at1.api.radio-browser.info'];
+async function api(p){for(const b of APIS){try{const r=await fetch(b+p);if(r.ok)return await r.json()}catch(e){}}throw 0}
+function cat(t){t=(t||'').toLowerCase();
+ if(/folk|фолк|чалга|chalga|народна|narodna/.test(t))return'Фолк и чалга';
+ if(/rock|metal|рок/.test(t))return'Рок';
+ if(/news|talk|новини/.test(t))return'Новини';
+ if(/jazz|classic|chill|lounge|ambient/.test(t))return'Джаз и класика';
+ if(/dance|electro|house|edm|techno/.test(t))return'Денс';
+ if(/pop|hits|top|хитове|поп/.test(t))return'Поп и хитове';
+ return'Други'}
+const ORDER=['Популярни','Поп и хитове','Фолк и чалга','Рок','Денс','Новини','Джаз и класика','Други','Света'];
+// ===== Икони =====
+const SO='fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+const IC={
+ home:'<path d="M3 11.5 12 4l9 7.5V21h-6.2v-6H9.2v6H3z"/>',
+ radio:'<g '+SO+'><path d="M12 13v8M9 21h6"/><path d="M8.5 8.5a5 5 0 000 7M15.5 8.5a5 5 0 010 7M5.5 5.5a9 9 0 000 13M18.5 5.5a9 9 0 010 13"/></g><circle cx="12" cy="12" r="1.8"/>',
+ grid:'<circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>',
+ star:'<path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4 6.1 20.7l1.3-6.6L2.5 9.5l6.6-.8z"/>',
+ clock:'<g '+SO+'><circle cx="12" cy="12" r="9"/><path d="M12 7v5.5l3.5 2"/></g>',
+ gear:'<g '+SO+'><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="7"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8"/></g>',
+ search:'<g '+SO+'><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></g>',
+ heart:'<path d="M12 21s-8.5-5.3-8.5-11.3A4.7 4.7 0 0112 7.2a4.7 4.7 0 018.5 2.5C20.5 15.7 12 21 12 21z"/>',
+ heartO:'<path '+SO+' d="M12 21s-8.5-5.3-8.5-11.3A4.7 4.7 0 0112 7.2a4.7 4.7 0 018.5 2.5C20.5 15.7 12 21 12 21z"/>',
+ play:'<path d="M7 4.5v15l12.5-7.5z"/>',
+ pause:'<rect x="6" y="4.5" width="4.2" height="15" rx="1"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1"/>',
+ prev:'<rect x="5" y="5" width="2.6" height="14" rx="1"/><path d="M19 5.5v13L9 12z"/>',
+ next:'<rect x="16.4" y="5" width="2.6" height="14" rx="1"/><path d="M5 5.5v13L15 12z"/>',
+ vol:'<path d="M3 9.5h4l5-4v13l-5-4H3z"/><path '+SO+' d="M15.5 8.5a5 5 0 010 7M18 6a8.5 8.5 0 010 12"/>',
+ eq:'<rect x="4" y="10" width="3" height="10" rx="1.5"/><rect x="10.5" y="4" width="3" height="16" rx="1.5"/><rect x="17" y="8" width="3" height="12" rx="1.5"/>'
+};
+const ico=n=>'<svg viewBox="0 0 24 24" class="ic" aria-hidden="true">'+IC[n]+'</svg>';
+
+// ===== Състояние =====
+let ST=[],cur=null,view='home',viewArg=null,sv=null,idx=0,tAcc=0,dip=null;
+const loadJ=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'')||d}catch(e){return d}};
+const saveJ=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let FAV=loadJ('fav',[]),REC=loadJ('rec',[]);
+function norm(s){return (s||'').toLowerCase().replace(/[^a-zа-я0-9]/g,'')}
+const hue=s=>[...s.name].reduce((a,ch)=>a+ch.charCodeAt(0),0)*37%360;
+const byName=n=>ST.find(s=>s.name===n);
+const isFav=s=>!!s&&FAV.includes(s.name);
+function toggleFav(s){if(!s)return;const i=FAV.indexOf(s.name);if(i<0)FAV.unshift(s.name);else FAV.splice(i,1);saveJ('fav',FAV);paintNow();syncNative();if(view==='home'||view==='favs')render(true)}
+function touchRecent(s){REC=[s.name,...REC.filter(n=>n!==s.name)].slice(0,30);saveJ('rec',REC);syncNative()}
+function nativeStation(name){const s=byName(name);
+ if(!s){pendingNS=name;return}
+ if(!cur||cur.name!==s.name){cur=s;idx=0;tAcc=0;nativeSong='';touchRecent(s);paintNow();if(ssOn){ssText=s.name;ssInit()}}}
+// списъкът с радиа отива към приложението, за да го показва и колата (Android Auto)
+function syncNative(){if(!NAT)return;clearTimeout(syncT);syncT=setTimeout(()=>{try{
+ if(pendingNS){const n=pendingNS;pendingNS=null;nativeStation(n)}
+ const al=ST.filter(alive);
+ const g=ORDER.map(c=>({k:c,v:al.filter(s=>inCat(s,c)).map(s=>s.name)})).filter(x=>x.v.length);
+ NAT.setStations(JSON.stringify({st:al.map(s=>({n:s.name,u:s.urls,c:s.cat,s:s.sub||''})),fav:FAV.filter(n=>byName(n)),rec:REC.filter(n=>byName(n)),g}))
+}catch(e){}},600)}
+
+// ===== Здраве на радиата (кеш 12 ч) =====
+let HL=loadJ('hl',{});
+const HTTL=12*3600e3;
+const alive=s=>!(HL[s.name]&&HL[s.name].ok===false);
+const saveHL=()=>saveJ('hl',HL);
+function probe(url,ms=10000){return new Promise(res=>{
+ const a=new Audio();a.muted=true;a.preload='auto';let d=0;
+ const fin=ok=>{if(d)return;d=1;clearTimeout(tm);try{a.pause()}catch(e){}a.removeAttribute('src');try{a.load()}catch(e){}res(ok)};
+ const tm=setTimeout(()=>fin(false),ms);
+ ['loadedmetadata','loadeddata','canplay','playing'].forEach(ev=>a.addEventListener(ev,()=>fin(true)));
+ a.addEventListener('error',()=>fin(false));
+ a.src=url;try{a.load()}catch(e){}})}
+async function checkStation(s){for(const u of s.urls){if(await probe(u))return true}return false}
+async function pool(arr,fn,k=3){let i=0;await Promise.all(Array.from({length:k},async()=>{while(i<arr.length){const s=arr[i++];try{await fn(s)}catch(e){}}}))}
+let chkBusy=false,updBusy=false;
+async function checkAll(force){
+ if(chkBusy||updBusy)return;chkBusy=true;
+ try{
+  const now=Date.now(),seen=new Set(),todo=[];
+  ST.forEach(s=>{if(seen.has(s.name))return;seen.add(s.name);const h=HL[s.name];if(force||!h||now-h.t>HTTL)todo.push(s)});
+  if(!todo.length){if(force)status('Всички радиа са проверени скоро');return}
+  let n=0;const res={};
+  await pool(todo,async s=>{res[s.name]=await checkStation(s);status('Проверка '+(++n)+'/'+todo.length+'…')});
+  await pool(todo.filter(s=>!res[s.name]),async s=>{res[s.name]=await checkStation(s)});
+  const okN=todo.filter(s=>res[s.name]).length;
+  if(todo.length>=5&&okN<todo.length*.05){status('Проверката не е надеждна на това устройство – нищо не е премахнато');return}
+  todo.forEach(s=>{HL[s.name]={ok:!!res[s.name],t:now}});saveHL();
+  refresh();
+  status('Проверка: '+okN+' работят, '+(todo.length-okN)+' скрити')
+ }finally{chkBusy=false}
+}
+// ===== Каталог =====
+function conv(s){
+ const urls=[s.url_resolved,s.url].filter(u=>u&&u.startsWith('https://'));
+ const name=(s.name||'').trim();
+ if(!urls.length||s.hls==1||!name)return null;
+ return{cat:cat(s.tags),name,urls:[...new Set(urls)],sub:[s.codec,s.bitrate?s.bitrate+'k':''].filter(Boolean).join(' ')||'Радио',bg:1}}
+function recomputePop(){let n=0;ST.forEach(s=>{s.pop=0;if(s.bg&&alive(s)&&n<30){s.pop=1;n++}})}
+const inCat=(s,c)=>alive(s)&&(c==='Популярни'?s.pop:s.cat===c);
+function refresh(){recomputePop();render(true);paintNow();syncNative()}
+async function load(){
+ $('view').innerHTML='<div class="msg">Зареждам българските радиа…</div>';
+ let bg=[];
+ try{
+  const d=await api('/json/stations/search?countrycode=BG&hidebroken=true&order=clickcount&reverse=true&limit=500&is_https=true');
+  const seen=new Set();
+  d.forEach(r=>{const x=conv(r);if(!x||seen.has(norm(x.name)))return;seen.add(norm(x.name));bg.push(x)});
+ }catch(e){}
+ const ex=loadJ('extra',[]);
+ const have=new Set(bg.map(s=>norm(s.name)));
+ ex.forEach(s=>{if(s&&s.name&&s.urls&&!have.has(norm(s.name))){have.add(norm(s.name));bg.push(s)}});
+ ST=bg.concat(FIXED);
+ recomputePop();
+ try{const n=localStorage.getItem('last'),s=n&&ST.find(x=>x.name===n);if(s&&alive(s)){cur=s;status('Натисни ▶ за '+s.name)}}catch(e){}
+ setView('home');paintNow();
+ if(!bg.length)status('Българският каталог не зареди – има само международни станции');
+ setTimeout(()=>{const c=navigator.connection;if(!(c&&c.saveData)&&au.paused)checkAll(false)},4000);
+}
+// ===== Търсене на нови радиа (live update) =====
+async function findNew(){
+ if(updBusy||chkBusy)return;updBusy=true;
+ try{
+  status('Търся нови радиа…');
+  const qs=['/json/stations/search?countrycode=BG&hidebroken=true&order=clickcount&reverse=true&limit=1000&is_https=true',
+   '/json/stations/search?language=bulgarian&hidebroken=true&order=clickcount&reverse=true&limit=500&is_https=true',
+   '/json/stations/search?tag=bulgarian&hidebroken=true&order=clickcount&reverse=true&limit=300&is_https=true'];
+  const have=new Set(ST.map(s=>norm(s.name))),fresh=[];
+  for(const q of qs){try{(await api(q)).forEach(r=>{const x=conv(r);if(x&&!have.has(norm(x.name))){have.add(norm(x.name));x.sub='НОВО · '+x.sub;fresh.push(x)}})}catch(e){}}
+  if(!fresh.length){status('Няма нови радиа – списъкът е актуален');return}
+  let n=0;const res={};
+  await pool(fresh,async s=>{res[s.name]=await checkStation(s);status('Проверявам нови '+(++n)+'/'+fresh.length+'…')});
+  const now=Date.now();fresh.forEach(s=>{HL[s.name]={ok:!!res[s.name],t:now}});saveHL();
+  const good=fresh.filter(s=>res[s.name]);
+  if(!good.length){status('Намерени '+fresh.length+', но нито едно не работи');return}
+  ST=ST.filter(s=>s.bg).concat(good,ST.filter(s=>!s.bg));
+  saveJ('extra',loadJ('extra',[]).concat(good).slice(-300));
+  refresh();
+  status('Добавени '+good.length+' нови радиа')
+ }finally{updBusy=false}
+}
+
+// ===== Изгледи =====
+function listFor(){
+ if(view==='favs')return FAV.map(byName).filter(s=>s&&alive(s));
+ if(view==='recent')return REC.map(byName).filter(s=>s&&alive(s));
+ if(view==='list')return ST.filter(s=>inCat(s,viewArg));
+ if(view==='search'){const q=norm($('q').value);return q?ST.filter(s=>alive(s)&&(norm(s.name).includes(q)||norm(s.sub).includes(q)||norm(s.cat).includes(q))):[]}
+ return ST.filter(s=>inCat(s,'Популярни'));
+}
+function step(d){let l=listFor();if(!l.length)l=ST.filter(s=>inCat(s,'Популярни'));if(!l.length)return;let i=l.indexOf(cur);i=i<0?(d>0?0:l.length-1):(i+d+l.length)%l.length;play(l[i])}
+function card(s){const d=document.createElement('div');d.className='card';d.setAttribute('role','button');d._s=s;d.style.setProperty('--h',hue(s));
+ d.innerHTML='<button class="fv" aria-label="Любим"></button><b></b><div class="cb"><span></span><i class="pbtn">'+ico('play')+'</i></div>';
+ d.querySelector('b').textContent=s.name;d.querySelector('span').textContent=s.sub;
+ d.onclick=()=>play(s);d.querySelector('.fv').onclick=e=>{e.stopPropagation();toggleFav(s)};return d}
+const HC=['#c084fc','#2dd4bf','#ef4444','#facc15','#60a5fa','#fb923c'];
+function chip(s,i){const c=document.createElement('div');c.className='chip';c.setAttribute('role','button');c._s=s;
+ c.innerHTML='<i class="hrt" style="color:'+HC[i%HC.length]+'">'+ico('heart')+'</i><div><b></b><span></span></div><i class="eqi">'+ico('eq')+'</i>';
+ c.querySelector('b').textContent=s.name;c.querySelector('span').textContent=s.sub;c.onclick=()=>play(s);return c}
+function markPlaying(){$$('.card,.chip').forEach(el=>{el.classList.toggle('playing',el._s===cur);const f=el.querySelector('.fv');if(f){const on=isFav(el._s);f.classList.toggle('on',on);f.innerHTML=ico(on?'heart':'heartO')}})}
+const RAIL=[['home','radio','Радио'],['cats','grid','Категории'],['favs','star','Любими'],['recent','clock','Последни'],['settings','gear','Настройки']];
+function railKey(){return view==='home'?'home':(view==='cats'||(view==='list'&&viewArg!=='Популярни'))?'cats':view==='favs'?'favs':view==='recent'?'recent':view==='settings'?'settings':''}
+function paintRail(){const k=railKey();$$('#rail button').forEach(b=>b.classList.toggle('on',b.dataset.v===k))}
+function setView(v,a){view=v;viewArg=a||null;$('q').value='';render(false)}
+function render(keep){
+ const V=$('view'),sc=$('main').scrollTop;V.innerHTML='';
+ document.body.classList.toggle('nohero',view!=='home');
+ const sec=(t,fn)=>{const w=document.createElement('section'),h=document.createElement('div'),e=document.createElement('h2');h.className='sh';e.textContent=t;h.appendChild(e);
+  if(fn){const m=document.createElement('button');m.className='more';m.textContent='Виж всички →';m.onclick=fn;h.appendChild(m)}w.appendChild(h);V.appendChild(w);return w};
+ const hint=t=>{const d=document.createElement('div');d.className='msg';d.textContent=t;return d};
+ const grid=a=>{const g=document.createElement('div');g.className='grid';a.forEach(s=>g.appendChild(card(s)));return g};
+ const row=(a,f)=>{const r=document.createElement('div');r.className='row';a.forEach((s,i)=>r.appendChild(f(s,i)));return r};
+ if(view==='home'){
+  const pop=ST.filter(s=>inCat(s,'Популярни'));
+  sec('Популярни радиа',()=>setView('list','Популярни')).appendChild(pop.length?row(pop.slice(0,14),card):hint(ST.length?'Няма работещи станции':'Зареждам…'));
+  const fv=FAV.map(byName).filter(s=>s&&alive(s));
+  sec('Моите любими').appendChild(fv.length?row(fv,chip):hint('Натисни ♡ на станция, за да я добавиш тук'));
+ }else if(view==='cats'){
+  const g=document.createElement('div');g.className='grid';
+  ORDER.filter(c=>c!=='Популярни').forEach(c=>{const n=ST.filter(s=>inCat(s,c)).length;if(!n)return;
+   const b=document.createElement('button');b.className='catb';b.innerHTML=ico('grid')+'<b></b><span></span>';
+   b.children[1].textContent=c;b.children[2].textContent=n+' радиа';b.onclick=()=>setView('list',c);g.appendChild(b)});
+  sec('Категории').appendChild(g);
+ }else if(view==='settings'){
+  V.appendChild(settingsView());
+ }else{
+  const t=view==='list'?(viewArg==='Популярни'?'Популярни радиа':viewArg):view==='favs'?'Любими':view==='recent'?'Последни':'Резултати от търсенето';
+  const l=listFor();
+  sec(t).appendChild(l.length?grid(l):hint(view==='favs'?'Още нямаш любими – натисни ♡ на станция':view==='recent'?'Още няма слушани станции':'Няма намерени радиа'));
+ }
+ markPlaying();$('main').scrollTop=keep?sc:0;paintRail();
+}
+function settingsView(){
+ const ok=ST.filter(alive).length,box=document.createElement('div');box.className='set';
+ const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+ box.innerHTML='<h2>Настройки</h2>'+
+  '<div class="srow"><b>Радиа</b><span id="s1"></span></div>'+
+  '<div class="btns"><button class="btn" data-a="chk">'+ico('radio')+' Провери радиата</button><button class="btn" data-a="new">'+ico('search')+' Търси нови радиа</button><button class="btn" data-a="reset">'+ico('clock')+' Върни скритите</button></div>'+
+  '<div class="srow"><b>Екран</b><span id="s2"></span></div>'+
+  '<div class="srow"><b>Приложение</b><span id="s3"></span></div>'+
+  '<div class="btns" id="s4"></div><p class="ver">Версия 15 · PWA</p>';
+ box.querySelector('#s1').textContent='Работещи: '+ok+' · Скрити: '+(ST.length-ok)+' · Любими: '+FAV.length;
+ box.querySelector('#s2').textContent=wl?'Екранът остава буден (Wake Lock е активен).':nsv?'Екранът се държи буден с резервен метод.':'Wake Lock не е активен – докосни екрана или проверете дали сайтът е на https.';
+ box.querySelector('#s3').textContent=standalone?'Инсталирано – работи като приложение ✔':'Добави към началния екран: меню на браузъра → „Добави към начален екран“ / „Инсталирай“.';
+ if(dip&&!standalone){const b=document.createElement('button');b.className='btn';b.innerHTML=ico('home')+' Инсталирай приложението';b.onclick=()=>{dip.prompt();dip=null;b.remove()};box.querySelector('#s4').appendChild(b)}
+ box.onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;
+  if(a==='chk')checkAll(true);else if(a==='new')findNew();
+  else if(a==='reset'){HL={};saveHL();refresh();status('Скритите радиа са върнати – ще се проверят отново')}};
+ return box}
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;if(view==='settings')render(true)});
+
+// ===== Сега свири / управление =====
+function status(t){$('st').textContent=t}
+function fmt(n){const p=x=>String(x).padStart(2,'0');return p(Math.floor(n/3600))+':'+p(Math.floor(n/60)%60)+':'+p(n%60)}
+function setPP(){const p=!au.paused&&!au.ended&&!!cur;[$('pp'),$('pp2')].forEach(b=>b.innerHTML=ico(p?'pause':'play'));
+ $('bdg').classList.toggle('off',!p);$('bt').textContent=p?'Сега свири':cur?'На пауза':'Радио';
+ try{if(navigator.mediaSession)navigator.mediaSession.playbackState=p?'playing':'paused'}catch(e){}}
+function paintNow(){
+ const s=cur,name=s?s.name:'Избери радио';
+ $('nm').textContent=name;$('hn').textContent=name;$('cvt').textContent=s?s.name:'RADIO';
+ $('hs').textContent=s?[s.cat==='Света'?'Международно':s.cat,s.sub].filter(Boolean).join(' • '):'Избери станция от списъка';
+ $('cover').style.setProperty('--h',s?hue(s):220);
+ $('pp').disabled=$('pp2').disabled=!s;
+ const f=isFav(s);$('hfav').classList.toggle('on',f);$('hfav').innerHTML=ico(f?'heart':'heartO')+' Любими';
+ document.title=s?name+' – Радио':'Радио – Peugeot 308';
+ setPP();markPlaying();
+}
+function tryUrl(){
+ if(!cur)return;
+ if(idx>=cur.urls.length){document.body.classList.remove('pl');setPP();
+  if(navigator.onLine!==false){HL[cur.name]={ok:false,t:Date.now()};saveHL();refresh();status('Радиото не работи – скрито до следваща проверка')}else status('Няма връзка с интернет');return}
+ status('Свързвам…');au.src=cur.urls[idx];
+ au.play().catch(()=>{idx++;tryUrl()});
+}
+function play(s){cur=s;idx=0;tAcc=0;touchRecent(s);try{localStorage.setItem('last',s.name)}catch(e){}paintNow();tryUrl();meta();if(ssOn){ssText=s.name;ssInit()}}
+function togglePlay(){if(!cur)return;if(au.paused){au.src&&au.src!==location.href?au.play().catch(()=>{}):tryUrl()}else{au.pause();status('На пауза')}}
+au.addEventListener('error',()=>{idx++;tryUrl()});
+au.addEventListener('playing',()=>{status('Свири на живо');document.body.classList.add('pl');setPP()});
+au.addEventListener('waiting',()=>status('Буфериране…'));
+au.addEventListener('pause',()=>{document.body.classList.remove('pl');setPP()});
+$('pp').onclick=$('pp2').onclick=togglePlay;
+$('pv').onclick=$('pv2').onclick=()=>step(-1);
+$('nx').onclick=$('nx2').onclick=()=>step(1);
+$('hfav').onclick=()=>toggleFav(cur);
+setInterval(()=>{if(document.body.classList.contains('pl'))tAcc++;$('tm').textContent=cur?fmt(tAcc)+' · НА ЖИВО':''},1000);
+// звук
+(()=>{let v=.85;try{const x=localStorage.getItem('vol');if(x!==null&&!isNaN(+x))v=+x}catch(e){}
+ $('vol').value=Math.round(v*100);au.volume=v;
+ $('vol').oninput=()=>{au.volume=$('vol').value/100;try{localStorage.setItem('vol',au.volume)}catch(e){}}})();
+// медия сесия и физически бутони
+function meta(){try{if(!NAT&&navigator.mediaSession&&cur)navigator.mediaSession.metadata=new MediaMetadata({title:cur.name,artist:'Радио на живо',album:'Peugeot 308',artwork:[{src:'icon-512.png',sizes:'512x512',type:'image/png'}]})}catch(e){}}
+try{const ms=navigator.mediaSession;if(ms){
+ ms.setActionHandler('play',()=>{if(au.paused)togglePlay()});
+ ms.setActionHandler('pause',()=>{if(!au.paused)togglePlay()});
+ ms.setActionHandler('previoustrack',()=>step(-1));ms.setActionHandler('nexttrack',()=>step(1))}}catch(e){}
+addEventListener('keydown',e=>{const k=e.key;
+ if(k==='MediaTrackNext')step(1);else if(k==='MediaTrackPrevious')step(-1);
+ else if(k==='MediaPlayPause')togglePlay();else if(k==='MediaPlay'){if(au.paused)togglePlay()}else if(k==='MediaPause'){if(!au.paused)togglePlay()}
+ else return;e.preventDefault()});
+// ===== Построяване на екрана =====
+$('homeB').innerHTML=ico('home');$('setB').innerHTML=ico('gear');$('sico').innerHTML=ico('search');
+$('pv').innerHTML=$('pv2').innerHTML=ico('prev');$('nx').innerHTML=$('nx2').innerHTML=ico('next');
+$('bico').innerHTML=ico('eq');$('vico').innerHTML=ico('vol');$('pp').innerHTML=$('pp2').innerHTML=ico('play');
+RAIL.forEach(([v,i,l])=>{const b=document.createElement('button');b.dataset.v=v;b.innerHTML=ico(i)+'<span>'+l+'</span>';b.onclick=()=>setView(v);$('rail').appendChild(b)});
+$('homeB').onclick=()=>setView('home');$('setB').onclick=()=>setView('settings');
+$('q').addEventListener('input',()=>{const q=$('q').value.trim();
+ if(q){if(view!=='search')sv={view,viewArg};view='search';render(false)}
+ else if(view==='search'){view=sv?sv.view:'home';viewArg=sv?sv.viewArg:null;render(false)}});
+(()=>{const v=$('viz');for(let i=0;i<40;i++){const e=document.createElement('i');e.style.setProperty('--m',(35+Math.random()*65|0)+'%');e.style.animationDuration=(.6+Math.random()*.9).toFixed(2)+'s';e.style.animationDelay=(-Math.random()).toFixed(2)+'s';v.appendChild(e)}})();
+if(!NAT&&'serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+// ===== Матрица / скрийнсейвър =====
+const THEMES=[['Зелено','#00ff41'],['Жълто','#ffd400'],['Синьо','#2f9bff'],['Циан','#00ffe1'],['Червено','#ff2a2a'],['Лилаво','#b36bff'],['Бяло','#e6e6e6']];
+let th=0;try{th=+localStorage.getItem('th')||0}catch(e){}
+const CH='ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789ABCDEFZ:.=*+-<>';
+// време (сек): 0-15 плавно изграждане, 13-20 пулсация и осветяване, 20-22 разтваряне, до 23 само дъжд
+const T_BUILD=15,T_PULSE_END=20,T_END=22,T_CYCLE=23;
+let ssOn=false,raf=0,ssText='CD-B RECORDS',fs,cols,rows,drops,mask,cells,halo=new Set(),t0,last,cvx,hideT,dpr,W=0,H=0,ox,oy,ML,rzT;
+const cv=$('cv'),ssc=$('ssc'),ssEl=$('ss');
+const FONT=px=>'900 '+px+'px Arial,"Segoe UI",Roboto,sans-serif';
+const rc=()=>CH[Math.random()*CH.length|0];
+const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+function rgba(h,a){const n=parseInt(h.slice(1),16);return`rgba(${n>>16},${n>>8&255},${n&255},${a})`}
+function mix(h,w){const n=parseInt(h.slice(1),16),f=c=>Math.round(c+(255-c)*w);return`rgb(${f(n>>16)},${f(n>>8&255)},${f(n&255)})`}
+function buildMask(){
+ const m=document.createElement('canvas');m.width=cols;m.height=rows;const x=m.getContext('2d');
+ x.fillStyle='#000';x.fillRect(0,0,cols,rows);
+ const txt=ssText.toUpperCase().replace(/[^\p{L}\p{N}\s.&!'-]/gu,'').replace(/\s+/g,' ').trim()||'RADIO',w=txt.split(' ');
+ let lines=[txt];
+ if(w.length>1&&txt.length>8){let b=1,bd=1e9;for(let i=1;i<w.length;i++){const d=Math.abs(w.slice(0,i).join(' ').length-w.slice(i).join(' ').length);if(d<bd){bd=d;b=i}}lines=[w.slice(0,b).join(' '),w.slice(b).join(' ')]}
+ let f=Math.min(rows*.5/lines.length,cols*.55);
+ const fit=()=>{x.font=FONT(f);return Math.max(...lines.map(l=>x.measureText(l).width))};
+ while(fit()>cols*.94&&f>4)f-=.5;
+ const lh=f*1.2,y0=rows*.36-lh*(lines.length-1)/2;
+ x.fillStyle=x.strokeStyle='#fff';x.lineWidth=Math.max(.5,f*.05);x.lineJoin='round';x.textAlign='center';x.textBaseline='middle';
+ lines.forEach((l,i)=>{x.strokeText(l,cols/2,y0+i*lh);x.fillText(l,cols/2,y0+i*lh)});
+ const d=x.getImageData(0,0,cols,rows).data;mask=[];cells=[];
+ for(let c=0;c<cols;c++){mask[c]=[];for(let r=0;r<rows;r++){
+  if(d[(r*cols+c)*4]>115){const k={c,r,on:false,done:false,ch:'',la:.6+(r/rows)*6.5+Math.random()*6,ul:Math.random()*1.8};mask[c][r]=k;cells.push(k)}else mask[c][r]=null}}
+}
+function lockCell(k){k.on=true;k.done=true;k.ch=rc();
+ for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const nc=k.c+a,nr=k.r+b;if(nc>=0&&nc<cols&&nr>=0&&nr<rows&&!mask[nc][nr])halo.add(nc*1000+nr)}}
+function ssInit(){
+ const r=ssEl.getBoundingClientRect();W=Math.round(r.width)||innerWidth;H=Math.round(r.height)||innerHeight;
+ dpr=Math.min(2,window.devicePixelRatio||1);
+ cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cvx=cv.getContext('2d');
+ fs=Math.max(4,Math.round(W<H?W/80:Math.min(W,H)/64));cols=Math.floor(W/fs);rows=Math.floor(H/fs);
+ ox=(W-cols*fs)/2;oy=(H-rows*fs)/2;
+ drops=[];for(let c=0;c<cols;c++)drops.push({y:-Math.random()*rows*1.5,v:rows*(.16+Math.random()*.3)});
+ halo=new Set();buildMask();t0=last=performance.now();
+ cvx.setTransform(1,0,0,1,0,0);cvx.fillStyle='#000';cvx.fillRect(0,0,cv.width,cv.height);
+}
+
+// ===== Часовник: дата, час, година, ден от седмицата – винаги цял, пулсира =====
+const DAYS=['НЕДЕЛЯ','ПОНЕДЕЛНИК','ВТОРНИК','СРЯДА','ЧЕТВЪРТЪК','ПЕТЪК','СЪБОТА'];
+function clockLines(){const d=new Date(),p=n=>String(n).padStart(2,'0');
+ return[DAYS[d.getDay()]+' '+p(d.getDate())+'.'+p(d.getMonth()+1)+'.'+d.getFullYear(),p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())]}
+function drawClock(g,t,col,pal){
+ const L=clockLines(),W2=cols*fs,y0=rows*fs*.76,bh=rows*fs*.22;
+ let f1=bh*.24,f2=bh*.46;
+ cvx.font=FONT(f1);while(cvx.measureText(L[0]).width>W2*.92&&f1>8){f1-=1;cvx.font=FONT(f1)}
+ cvx.font=FONT(f2);while(cvx.measureText(L[1]).width>W2*.7&&f2>8){f2-=1;cvx.font=FONT(f2)}
+ const lv=.4*g+.6*(.5+.5*Math.sin(6.283*t*.7));
+ const T=[[L[0],f1,y0+bh*.14],[L[1],f2,y0+bh*.70]];
+ cvx.textAlign='center';cvx.textBaseline='middle';
+ // първо всички черни подложки, после текстовете – така долният ред не покрива горния
+ T.forEach(([txt,f,y])=>{cvx.font=FONT(f);const w=cvx.measureText(txt).width+fs*2;
+  cvx.fillStyle='#000';cvx.fillRect(W2/2-w/2,y-f*.62,w,f*1.24)});
+ T.forEach(([txt,f,y])=>{cvx.font=FONT(f);
+  cvx.shadowColor=col;cvx.shadowBlur=f*(.12+.25*lv);
+  cvx.fillStyle=pal[Math.round(lv*15)];cvx.fillText(txt,W2/2,y);
+  cvx.shadowBlur=0});
+ cvx.textAlign='left';cvx.textBaseline='top';
+}
+function frame(now){
+ raf=requestAnimationFrame(frame);if(!cvx)return;
+ const dt=Math.min(.1,(now-last)/1000);last=now;let t=(now-t0)/1000;
+ if(t>=T_CYCLE){t0=now;t=0;halo.clear();buildMask()}
+ const col=THEMES[th][1],head=mix(col,.8);
+ const pal=[],bg=[];for(let i=0;i<16;i++)pal.push(mix(col,.4+.55*i/15));for(let i=0;i<6;i++)bg.push(rgba(col,.05*i));
+ cvx.setTransform(dpr,0,0,dpr,0,0);
+ cvx.fillStyle='rgba(0,0,0,'+Math.min(.3,.05*dt*60)+')';cvx.fillRect(0,0,W,H);
+ cvx.setTransform(dpr,0,0,dpr,ox*dpr,oy*dpr);
+ cvx.font='bold '+fs+'px monospace';cvx.textAlign='left';cvx.textBaseline='top';
+ // плавно изграждане: буквата светва при първото падаща капка след определеното ѝ време, най-късно 0.9 сек след него
+ if(t<T_PULSE_END){for(const k of cells)if(!k.done&&t>=k.la+.9)lockCell(k)}
+ else{for(const k of cells)if(k.on&&t>=T_PULSE_END+k.ul)k.on=false}
+ if(t>=T_END&&halo.size)halo.clear();
+ for(let c=0;c<cols;c++){
+  const d=drops[c],pr=Math.floor(d.y);d.y+=d.v*dt;const r=Math.floor(d.y),x=c*fs;
+  for(let q=pr+1;q<=r;q++){
+   if(q>0&&q-1<rows){cvx.fillStyle='#000';cvx.fillRect(x,(q-1)*fs,fs,fs);cvx.fillStyle=col;cvx.fillText(rc(),x,(q-1)*fs)}
+   if(q>=0&&q<rows){cvx.fillStyle=head;cvx.fillText(rc(),x,q*fs);
+    const k=mask[c][q];if(k&&!k.done&&t>=k.la&&t<T_BUILD)lockCell(k)}
+  }
+  if(d.y>rows+Math.random()*rows*.3){d.y=-2-Math.random()*rows*.5;d.v=rows*(.16+Math.random()*.3)}
+ }
+ cvx.fillStyle='#000';halo.forEach(k=>cvx.fillRect(((k/1000)|0)*fs,(k%1000)*fs,fs,fs));
+ // пулсация и преливащо осветяване – започва плавно чак когато надписът е изграден
+ const amp=cl((t-13.5)/2,0,1)*cl((T_END-.5-t)/1.5,0,1),g=.5+.5*Math.sin(6.283*t*.8);
+ for(const k of cells){if(!k.on)continue;
+  if(Math.random()<.01)k.ch=rc();
+  const lv=amp*(.4*g+.6*(.5+.5*Math.sin(6.283*(t*.7-k.c/cols*1.2)))),X=k.c*fs,Y=k.r*fs;
+  cvx.fillStyle='#000';cvx.fillRect(X,Y,fs,fs);
+  if(amp>.01){cvx.fillStyle=bg[Math.round(lv*5)];cvx.fillRect(X,Y,fs,fs)}
+  cvx.fillStyle=pal[Math.round(lv*15)];cvx.fillText(k.ch,X,Y)}
+ drawClock(g,t,col,pal);
+}
+function showC(){ssc.style.opacity=1;ssc.style.pointerEvents='auto';clearTimeout(hideT);hideT=setTimeout(()=>{ssc.style.opacity=0;ssc.style.pointerEvents='none'},5000)}
+function markDots(){[...ssc.querySelectorAll('.dot')].forEach((b,i)=>b.classList.toggle('sel',i===th))}
+function openSS(){if(ssOn)return;ssOn=true;if(NAT)try{NAT.fullscreen(true)}catch(e){}ssText=cur?cur.name:'CD-B RECORDS';ssEl.style.display='block';
+ try{const p=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(()=>{})}catch(e){}
+ ssInit();cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);markDots();showC()}
+function closeSS(){ssOn=false;if(NAT)try{NAT.fullscreen(false)}catch(e){}cancelAnimationFrame(raf);ssEl.style.display='none';
+ try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}
+THEMES.forEach((t,i)=>{const b=document.createElement('button');b.className='dot';b.style.background=t[1];b.setAttribute('aria-label',t[0]);
+ b.onclick=e=>{e.stopPropagation();th=i;try{localStorage.setItem('th',i)}catch(x){}markDots();showC()};ssc.appendChild(b)});
+[['⏮',()=>step(-1)],['⏯',()=>$('pp').click()],['⏭',()=>step(1)],['✕',closeSS]].forEach(([l,f])=>{const b=document.createElement('button');b.textContent=l;b.onclick=e=>{e.stopPropagation();f();showC()};ssc.appendChild(b)});
+cv.onclick=showC;$('ssb').onclick=()=>ssOn?closeSS():openSS();
+// синхронизация с устройството: размер, завъртане, цял екран
+function onSize(){if(!ssOn)return;clearTimeout(rzT);rzT=setTimeout(()=>{const r=ssEl.getBoundingClientRect();
+ if(Math.round(r.width)!==W||Math.round(r.height)!==H||Math.min(2,devicePixelRatio||1)!==dpr)ssInit()},250)}
+addEventListener('resize',onSize);addEventListener('orientationchange',onSize);document.addEventListener('fullscreenchange',onSize);
+if(window.visualViewport)visualViewport.addEventListener('resize',onSize);
+if(window.ResizeObserver)new ResizeObserver(onSize).observe(ssEl);
+
+// ===== Екранът да не заспива =====
+let wl=null,nsv=null,nst=0;
+function fallbackAwake(){if(nsv)return;try{
+ const c=document.createElement('canvas');c.width=c.height=16;const x=c.getContext('2d');
+ const v=document.createElement('video');v.muted=true;v.loop=true;v.setAttribute('playsinline','');
+ v.style.cssText='position:fixed;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none';
+ v.srcObject=c.captureStream(5);document.body.appendChild(v);
+ v.play().then(()=>{nsv=v;nst=setInterval(()=>{x.fillStyle='#'+(Math.random()*0xffffff|0).toString(16).padStart(6,'0');x.fillRect(0,0,16,16)},500)}).catch(()=>v.remove());
+}catch(e){}}
+async function keepAwake(){
+ try{if('wakeLock' in navigator&&!wl){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>{wl=null})}}catch(e){wl=null}
+ if(!wl)fallbackAwake();
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)keepAwake()});
+addEventListener('pointerdown',keepAwake);
+au.addEventListener('playing',keepAwake);
+keepAwake();
+
+if(NAT){const b=document.createElement('button');b.id='whoB';b.className='btn';b.style.cssText='padding:.7rem 1.1rem;font-size:1rem';b.textContent='🎵 Коя е песента?';
+ $('hfav').after(b);b.onclick=()=>status(nativeSong?'🎵 '+nativeSong:'Радиото не подава име на песента в момента')}
+
+load();
+</script>
+</body>
+</html>

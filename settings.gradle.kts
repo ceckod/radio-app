@@ -1,12 +1,5 @@
 pluginManagement {
     repositories {
-//        google {
-//            content {
-//                includeGroupByRegex("com\\.android.*")
-//                includeGroupByRegex("com\\.google.*")
-//                includeGroupByRegex("androidx.*")
-//            }
-//        }
         google()
         mavenCentral()
         gradlePluginPortal()
@@ -20,6 +13,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Open open radio"
+rootProject.name = "Radio"
+// Името на модула остава същото, за да работи GitHub workflow-ът; кодът е в папка radioapp
 include(":openopenradiomobile")
-include(":openopenradioservice")
+project(":openopenradiomobile").projectDir = file("radioapp")
